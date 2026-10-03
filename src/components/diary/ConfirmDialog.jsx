@@ -18,6 +18,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   destructive = false,
+  busy = false,
 }) {
   const dialogRef = useRef(null);
   const cancelRef = useRef(null);
@@ -47,25 +48,26 @@ export function ConfirmDialog({
       aria-describedby={children ? descriptionId : undefined}
       onCancel={(event) => {
         event.preventDefault();
-        onCancel();
+        if (!busy) onCancel();
       }}
       onPointerDown={(event) => {
         backdropPointerRef.current = isOutsideDialog(event);
       }}
       onClick={(event) => {
-        if (backdropPointerRef.current && isOutsideDialog(event)) onCancel();
+        if (!busy && backdropPointerRef.current && isOutsideDialog(event)) onCancel();
         backdropPointerRef.current = false;
       }}
     >
       <h2 id={titleId}>{title}</h2>
       {children ? <div className="diary-confirm-copy" id={descriptionId}>{children}</div> : null}
       <div className="diary-confirm-actions">
-        <button className="diary-secondary" type="button" ref={cancelRef} autoFocus onClick={onCancel}>
+        <button className="diary-secondary" type="button" ref={cancelRef} autoFocus disabled={busy} onClick={onCancel}>
           取消
         </button>
         <button
           className={`diary-primary${destructive ? ' is-destructive' : ''}`}
           type="button"
+          disabled={busy}
           onClick={onConfirm}
         >
           {confirmLabel}

@@ -1,0 +1,31 @@
+[Unit]
+Description=Treehool mood diary
+After=network.target
+
+[Service]
+Type=simple
+User=treehool
+Group=treehool
+WorkingDirectory=/opt/treehool
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=DATABASE_PATH=/var/lib/treehool/diary.sqlite
+# Optional overrides; keep DATABASE_PATH=/var/lib/treehool/diary.sqlite here.
+EnvironmentFile=-/etc/treehool.env
+# Change this path if Node 24 is installed elsewhere (check: command -v node).
+ExecStart=/usr/bin/node /opt/treehool/server/index.mjs
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+StateDirectory=treehool
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/treehool
+
+[Install]
+WantedBy=multi-user.target

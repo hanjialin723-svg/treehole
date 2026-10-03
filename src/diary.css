@@ -51,6 +51,9 @@
 .diary-notice button { color: inherit; background: transparent; border: 0; text-decoration: underline; }
 .diary-notice:not(.diary-error) { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 36px); margin: 0; padding: 10px 19px; border: 1px solid #d7c291; border-radius: 8px; background: #fff2cf; color: #625b4d; box-shadow: 0 5px 25px #09213355; z-index: 15; }
 .diary-error { color: #ffd4cf; }
+.diary-import { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin: 18px 24px; padding: 12px 18px; border: 1px solid #dcc98665; border-radius: 8px; background: #13324988; font-size: 14px; line-height: 1.7; }
+.diary-import button { border: 0; border-bottom: 1px solid currentColor; padding: 3px 0; color: #ffebba; background: transparent; white-space: nowrap; }
+.diary-shell button:disabled { cursor: default; opacity: .55; transform: none; }
 .diary-missing { display: grid; justify-items: center; padding: 20vh 20px; text-align: center; gap: 15px; }
 .diary-missing h1 { font-weight: 400; margin: 0; }
 .diary-editor-book { margin-top: 26px; }

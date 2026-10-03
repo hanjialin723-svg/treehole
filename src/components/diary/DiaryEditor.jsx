@@ -12,6 +12,8 @@ export function DiaryEditor({ entry, onSave, onDelete, onNavigate, registerNavig
   const [error, setError] = useState('');
   const [pendingLeave, setPendingLeave] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   const titleRef = useRef(null);
   const savedRef = useRef(false);
   const original = useRef(entry);
@@ -23,46 +25,53 @@ export function DiaryEditor({ entry, onSave, onDelete, onNavigate, registerNavig
 
   useEffect(() => { titleRef.current?.focus({ preventScroll: true }); }, []);
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty && !busy) return;
     return registerNavigationGuard((proceed, cancel) => {
+      if (busyRef.current) { cancel?.(); return; }
       if (!savedRef.current) setPendingLeave({ proceed, cancel });
       else proceed();
     });
-  }, [dirty, registerNavigationGuard]);
+  }, [dirty, busy, registerNavigationGuard]);
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty && !busy) return;
     const beforeUnload = (event) => { if (!savedRef.current) { event.preventDefault(); event.returnValue = ''; } };
     window.addEventListener('beforeunload', beforeUnload);
     return () => window.removeEventListener('beforeunload', beforeUnload);
-  }, [dirty]);
+  }, [dirty, busy]);
 
-  function save(event) {
+  async function save(event) {
     event.preventDefault();
-    const result = onSave({ id: entry?.id, date, content, weatherMode, weather }, original.current?.updatedAt);
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    setError('');
+    const result = await onSave({ id: entry?.id, date, content, weatherMode, weather }, original.current?.updatedAt);
+    busyRef.current = false;
+    setBusy(false);
     if (!result.ok) { setError(result.error); return; }
     savedRef.current = true;
     onNavigate('/diary');
   }
 
-  return <form className="diary-editor" onSubmit={save}>
+  return <form className="diary-editor" onSubmit={save} aria-busy={busy}>
     <header className="diary-topbar">
       <div>
-        <button type="button" className="diary-back" onClick={() => onNavigate('/diary')}><Icon name="arrow-left" />回到日记本</button>
+        <button type="button" className="diary-back" disabled={busy} onClick={() => onNavigate('/diary')}><Icon name="arrow-left" />回到日记本</button>
         <h1 tabIndex={-1} ref={titleRef}>{entry ? '编辑日记' : '写下今天'}</h1>
         <p className="diary-subtitle">让这一刻的心情，落在纸上。</p>
       </div>
-      <button className="diary-primary" type="submit"><Icon name="check" />保存日记</button>
+      <button className="diary-primary" type="submit" disabled={busy}><Icon name="check" />{busy ? '正在保存……' : '保存日记'}</button>
     </header>
     {error ? <p className="diary-notice diary-error" role="alert">{error}</p> : null}
     <BookFrame className="diary-editor-book">
       <section className="diary-paper diary-writing-page" aria-label="日记正文">
         <div className="diary-editor-date">
           <label htmlFor="diary-date">日期</label>
-          <input id="diary-date" type="date" required value={date}
+          <input id="diary-date" type="date" required value={date} disabled={busy}
             onInput={(event) => setDate(event.currentTarget.value)} onChange={(event) => setDate(event.target.value)} />
         </div>
         <label className="diary-writing-label" htmlFor="diary-content">今天的心事</label>
-        <textarea id="diary-content" placeholder="今天发生了什么？从一件小事写起吧……" required maxLength={2000}
+        <textarea id="diary-content" placeholder="今天发生了什么？从一件小事写起吧……" required maxLength={2000} disabled={busy}
           value={content} onChange={(event) => { setContent(event.target.value); if (error) setError(''); }} />
         <div className="diary-writing-footer"><span>几句话，也是一篇日记。</span><span>{content.length} / 2000</span></div>
       </section>
@@ -73,11 +82,11 @@ export function DiaryEditor({ entry, onSave, onDelete, onNavigate, registerNavig
           <h3>{content.trim() || weatherMode === 'manual' ? selected.label : '等一阵心里的风'}</h3>
           <p>{content.trim() || weatherMode === 'manual' ? selected.hint : '写下几句话，让心情慢慢浮现。'}</p>
         </div>
-        <button type="button" className={`diary-auto-weather ${weatherMode === 'auto' ? 'is-active' : ''}`}
+        <button type="button" disabled={busy} className={`diary-auto-weather ${weatherMode === 'auto' ? 'is-active' : ''}`}
           aria-pressed={weatherMode === 'auto'} onClick={() => setWeatherMode('auto')}>
           <span className="diary-radio-dot" />根据文字自动生成
         </button>
-        <fieldset className="diary-weather-options">
+        <fieldset className="diary-weather-options" disabled={busy}>
           <legend>也可以选一个更贴近自己的天气</legend>
           <div>{WEATHER_OPTIONS.map((option) => <button type="button" key={option.id}
             className={weatherMode === 'manual' && weather === option.id ? 'is-selected' : ''}
@@ -90,17 +99,22 @@ export function DiaryEditor({ entry, onSave, onDelete, onNavigate, registerNavig
       </section>
     </BookFrame>
     <footer className="diary-editor-bottom">
-      <span>{dirty ? '尚未保存' : entry ? '已保存的日记' : '新的一页，慢慢写。'}</span>
-      {entry ? <button type="button" className="diary-delete" onClick={() => setDeleting(true)}><Icon name="trash" size={16} />删除这篇日记</button> : null}
+      <span role="status">{busy ? '正在与日记本同步……' : dirty ? '尚未保存' : entry ? '已保存的日记' : '新的一页，慢慢写。'}</span>
+      {entry ? <button type="button" className="diary-delete" disabled={busy} onClick={() => setDeleting(true)}><Icon name="trash" size={16} />删除这篇日记</button> : null}
     </footer>
     {pendingLeave ? <ConfirmDialog title="这页心事还没保存" confirmLabel="放弃修改" onCancel={() => { pendingLeave.cancel?.(); setPendingLeave(null); }}
       onConfirm={() => { savedRef.current = true; pendingLeave.proceed(); }}><p>继续写，或放下这次还未保存的修改。</p></ConfirmDialog> : null}
-    {deleting ? <ConfirmDialog title="删除这篇日记？" confirmLabel="删除日记" destructive onCancel={() => setDeleting(false)}
-      onConfirm={() => {
-        const result = onDelete(entry.id, original.current.updatedAt);
+    {deleting ? <ConfirmDialog title="删除这篇日记？" confirmLabel={busy ? '正在删除……' : '删除日记'} busy={busy} destructive onCancel={() => setDeleting(false)}
+      onConfirm={async () => {
+        if (busyRef.current) return;
+        busyRef.current = true;
+        setBusy(true);
+        const result = await onDelete(entry.id, original.current.updatedAt);
+        busyRef.current = false;
+        setBusy(false);
         if (!result.ok) { setError(result.error); setDeleting(false); return; }
         savedRef.current = true;
         onNavigate('/diary');
-      }}><p>这篇日记会从当前浏览器移除，无法恢复。</p></ConfirmDialog> : null}
+      }}><p>这篇日记会从日记本中永久删除，所有访客都将无法再查看。</p></ConfirmDialog> : null}
   </form>;
 }
