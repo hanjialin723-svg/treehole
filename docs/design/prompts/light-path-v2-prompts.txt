@@ -1,0 +1,9 @@
+Tool: built-in image_gen
+Edit target: light-path.png; broad trapezoidal doorway road revision
+
+Use case: precise-object-edit.
+Asset type: transparent warm light path sprite in hand-painted oil pastel.
+Input image 1 is the image to revise. Preserve its warm buttery-yellow center, golden crayon strokes, textured imperfect wax-pigment edges, softly luminous fringe, and diagonal direction. Change ONLY its silhouette from a pointed triangular comet to a broad FOUR-CORNERED trapezoidal diagonal road of light. Genuine transparent alpha outside.
+Required composition on 1536x1024 canvas: the four corners of the broad path are exactly approximately A=(82% width,8% height), B=(98% width,18% height), C=(18% width,100% height), D=(0% width,84% height). Connect A-B-C-D-A. A-B is the upper-right doorway threshold edge: a BROAD BLUNT DIAGONAL END spanning 16% of canvas width, never a point. C-D is the lower-left viewer end: broader by a little and running off canvas bottom-left. The long sides A-D and B-C are almost parallel, gently widening toward bottom-left. This is an elongated trapezoid / strip of golden light with a clearly broad squared upper-right end, NOT a triangle, NOT a comet, NOT a cone, NOT a point. The diagonal road fills this quadrilateral with warm light. Do not draw any literal boundary lines or coordinate marks.
+Texture and color must remain beautifully hand-drawn and match input: buttery pale yellow inner pigment, golden lemon yellow outer strokes, diagonal parallel crayon scratches following the long direction, uneven hand-painted fringe and restrained warm glow.
+NO book, no girl, no shadow, no stars, no sparkles, no other objects, no blue background, no black background, no labels, no text. Transparent surroundings.

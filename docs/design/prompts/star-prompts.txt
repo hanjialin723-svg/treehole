@@ -1,0 +1,11 @@
+Tool: built-in image_gen
+Reference: user-provided hand-painted star and book image
+
+Use case: illustration-story.
+Asset type: one transparent raster sprite for a hand-painted children's storybook website.
+Input image 1: style and shape reference only. Study its large yellow five-point star at the bottom right.
+Primary request: generate ONE isolated five-point yellow star, closely matching that bottom-right reference star's irregular childish skewed silhouette, rich oil-pastel/crayon grain, soft warm yellow coloring, and rough hand-drawn edges.
+Scene/backdrop: genuinely transparent alpha background everywhere around the star, no background color, no scene.
+Composition: square 1024x1024 canvas. Full star centered, entirely visible with about 10 percent transparent margins on all sides. Broad horizontal silhouette, slightly wider than tall. The five blunt-ish tapering points are charmingly uneven and asymmetric, as in the reference. One point aims downward, two upper points lean away from each other, side points extend out. Do not use a standard mathematically symmetric upright vector star.
+Materials/textures: densely hand-rubbed lemon yellow and soft golden oil pastel, visible uneven crayon strokes across the yellow body, ochre strokes along irregular edges; warm lemon center. Flat painted artwork with tangible wax pigment texture, not glossy plastic and not smooth CGI.
+Constraints: exactly one star, no face, no eyes, no text, no labels, no watermark, no other objects, no blue background, no cast shadow, no giant halo or diffuse outer glow. Preserve genuine transparent pixels around the textured shape; lighting will be added in code.

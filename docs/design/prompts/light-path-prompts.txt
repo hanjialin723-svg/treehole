@@ -1,0 +1,10 @@
+Tool: built-in image_gen
+Reference: user-provided hand-painted star and book image
+
+Use case: illustration-story.
+Asset type: a transparent hand-painted light path sprite, for a children's storybook interactive web scene.
+Input image 1: style and material reference. Match only the diagonal yellow road of light that extends from the book doorway toward bottom-left in that painting.
+Primary request: ONE isolated elongated triangular wedge of soft warm golden-yellow light painted in waxy oil pastel. Wide 3:2 canvas, 1536x1024 preferred, genuinely transparent RGBA background around it.
+Composition: diagonal light path running from a narrow source near (91%, 10%) to a wide lower-left end near (10%, 89%). The direction MUST be from upper-right to bottom-left. It begins narrow near top-right and expands smoothly toward bottom-left, like light cast from a doorway onto a surface. Keep complete wedge inside canvas with modest transparent margin, preserving the broad end. Natural uneven edges.
+Texture: rich visible parallel diagonal crayon scratches and layered rubbed oil-pastel strokes following the beam length. Strong warm lemon-yellow near upper-right source, broad creamy pale-yellow interior toward lower-left, warm golden irregular fringes. Soft imperfect feathered edges with streaky wax pigment; retain a hand-drawn look consistent with reference, not a digitally perfect gradient or polished volumetric CGI.
+Constraints: ONLY the light path, no book, no girl, no people, no silhouettes, no cast shadows, no stars, no sparkles, no objects, no blue paper, no black backdrop, no text, no border, no labels, no background. Genuinely transparent alpha outside the yellow light path. Do not bake in surrounding landscape or dark tones.

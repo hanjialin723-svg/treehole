@@ -1,0 +1,20 @@
+:root {
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", "Noto Serif CJK SC", serif;
+  color: #f7e4ad;
+  background: #225775;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --color-cream: #f7e4ad;
+  --color-gold: #ffe16e;
+  --color-night: #225775;
+}
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { min-width: 320px; }
+button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button { font: inherit; }
+button:not(:disabled), a { cursor: pointer; }
+button:disabled { cursor: default; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--color-cream); outline-offset: 8px; }
+::selection { color: #243f52; background: #ffe9a6; }
