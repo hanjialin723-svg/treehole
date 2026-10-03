@@ -21,7 +21,10 @@ export function getStoryPhase(elapsed, reduced = false) {
 }
 export function parseRoute(hash) {
   const path = hash.replace(/^#/, '') || '/';
-  if (path === '/diary') return { kind: 'diary' };
+  if (path === '/diary') return { kind: 'diary', view: 'list' };
+  if (path === '/diary/new') return { kind: 'diary', view: 'new' };
+  const entryMatch = path.match(/^\/diary\/entry\/([a-zA-Z0-9_-]+)$/);
+  if (entryMatch) return { kind: 'diary', view: 'edit', entryId: entryMatch[1] };
   const starMatch = path.match(/^\/stars\/([1-3])$/);
   return starMatch ? { kind: 'star', starId: starMatch[1] } : { kind: 'scene' };
 }
