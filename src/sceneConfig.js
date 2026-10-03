@@ -1,7 +1,7 @@
 export const SCENE_ART = {
   background: '/art/background.webp', bookClosed: '/art/book-closed.webp',
   bookOpen: '/art/book-open.webp', girl: '/art/girl-sprites.webp',
-  star: '/art/star.webp', light: '/art/light-path-v2.webp',
+  star: '/art/star.webp', light: '/art/light-path-v2.webp', paper: '/art/page-sheet.webp',
 };
 export const STARS = [
   { id: '1', name: '第一颗星', className: 'star-one', delay: '0ms' },
@@ -14,8 +14,9 @@ export const REDUCED_DURATION = 850;
 export function getStoryPhase(elapsed, reduced = false) {
   if (reduced) return elapsed < 450 ? 'lit' : 'entering';
   if (elapsed < 1200) return 'rising';
-  if (elapsed < 2100) return 'walking';
-  if (elapsed < 4500) return 'opening';
+  if (elapsed < 1800) return 'walking';
+  if (elapsed < 2560) return 'cracking';
+  if (elapsed < 4800) return 'opening';
   if (elapsed < 5900) return 'lit';
   return 'entering';
 }

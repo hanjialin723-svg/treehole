@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SCENE_ART, STARS } from '../sceneConfig.js';
 import { useSceneAssets } from '../hooks/useSceneAssets.js';
 import { useStory } from '../hooks/useStory.js';
 import { useParallax } from '../hooks/useParallax.js';
+import { EnchantedBook } from './EnchantedBook.jsx';
+import { applyBookMotion } from '../bookMotion.js';
 import '../scene.css';
 
 const motes = Array.from({ length: 30 }, (_, index) => ({
@@ -11,7 +13,7 @@ const motes = Array.from({ length: 30 }, (_, index) => ({
 }));
 const messages = {
   idle: '点击书本，走进心情日记', rising: '慢慢起身，把心事带上。',
-  walking: '向着那一点温暖，走近一些。', opening: '书页轻轻打开，星光正在醒来。',
+  walking: '向着那一点温暖，走近一些。', cracking: '书缝里，有一点微光。', opening: '书页轻轻打开，星光正在醒来。',
   lit: '每一种心情，都值得被温柔收藏。', entering: '让今天的故事，从这里开始。',
 };
 
@@ -23,7 +25,8 @@ export function StoryScene({ onEnter, onNavigate }) {
   const [hidden, setHidden] = useState(document.hidden);
   const reduced = systemReduced || simpleMotion;
   const { status, retry } = useSceneAssets();
-  const { phase, playing, begin } = useStory(onEnter, reduced);
+  const updateBook = useCallback((elapsed, simplified) => applyBookMotion(sceneRef.current, elapsed, simplified), []);
+  const { phase, playing, begin } = useStory(onEnter, reduced, updateBook);
   const illuminated = ['opening', 'lit', 'entering'].includes(phase);
   useParallax(sceneRef, !reduced && !playing);
 
@@ -75,16 +78,7 @@ export function StoryScene({ onEnter, onNavigate }) {
       <div className="scene-canvas">
         <div className="world-layer">
           <img className="light-path" src={SCENE_ART.light} alt="" draggable="false" />
-          <div className="book-position">
-            <button type="button" className="book-button" onClick={begin}
-              disabled={status !== 'ready' || playing} aria-label="打开书本，走进心情日记本"
-              aria-describedby="scene-instruction">
-              <img className="book-open book-aura" src={SCENE_ART.bookOpen} alt="" draggable="false" aria-hidden="true" />
-              <img className="book-open" src={SCENE_ART.bookOpen} alt="" draggable="false" />
-              <img className="book-closed" src={SCENE_ART.bookClosed} alt="" draggable="false" />
-              <span className="book-label">心情日记本</span>
-            </button>
-          </div>
+          <EnchantedBook onOpen={begin} disabled={status !== 'ready' || playing} />
           <div className="girl-position" aria-hidden="true">
             <div className="girl-shadow" />
             <div className="girl-sprite" />

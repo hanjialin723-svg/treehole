@@ -10,6 +10,7 @@ Run the local server yourself and open the preview in the browser available to t
 - Stars brighten and scale up on hover/focus, restoring their scene-dependent appearance on leave; each links to its own placeholder.
 - Mood diary is the next part of this same app; currently only a destination placeholder. Do not invent diary functionality until the user provides the next requirements.
 - Keep local Git history. Runtime art is optimized WebP; preserve original PNGs and generation prompts under docs/design.
+- Opening revision: keep the book body, spine, back board and page block fixed. Hinge only the front cover, with two faces and visible thickness; turn a few separate pages. Open a narrow light crack into a broad beam as the leaves part. Hold the girl's arrival for about one second before automatic diary navigation. Never rotate/fade the full book sprite to simulate opening.
 
 Before making substantial visual changes, use the Product Design plugin's `get-context` skill when the visual source is unclear or no longer matches the current goal. When the user gives durable prototype-specific design feedback, preferences, or decisions, record them in `AGENTS.md`.
 

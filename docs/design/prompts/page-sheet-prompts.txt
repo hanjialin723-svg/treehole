@@ -1,0 +1,7 @@
+Page sheet texture — built-in imagegen, 2026-10-03
+
+Use case: illustration-story. Asset type: isolated flat page texture for a hand-painted animated storybook website. Input images 1 and 2 are STYLE REFERENCES ONLY, especially their pale creamy paper strokes. Create ONE single FLAT FRONT-ON RECTANGULAR parchment page / inner book-cover sheet, portrait aspect 2:3, directly facing camera, absolutely no perspective, no book structure. Warm butter-cream and pale ivory oil-pastel strokes with visible coarse fibrous grain, subtle pale ochre shading just inside the right edge, tiny sparse muted gold flecks. The rectangular sheet fills the canvas nearly edge-to-edge with no more than 2% genuinely transparent margin at every side; edges barely uneven and softly fibrous but essentially straight rectangle. The body of paper must be opaque and uniform, suitable as a texture for an independently turning animated page. Scene/backdrop: true transparent alpha outside the sheet. No text, no letters, no large stars, no icons, no scene, no background, no spine, no cast shadow, no 3D book, no perspective, no curl, no multiple pages, no border, no surrounding glow. Preserve the hand-drawn oil pastel material quality of the reference paper. Output one portrait PNG with true transparency.
+
+Reference images: docs/design/originals/book-open.png; docs/design/originals/book-closed.png
+Generated original: docs/design/originals/page-sheet.png (1024 × 1536, RGBA)
+Runtime derivative: public/art/page-sheet.webp (trim transparent margins, resize to 720px wide, WebP quality 88)
