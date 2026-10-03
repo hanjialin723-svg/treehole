@@ -4,7 +4,7 @@ import { useSceneAssets } from '../hooks/useSceneAssets.js';
 import { useStory } from '../hooks/useStory.js';
 import { useParallax } from '../hooks/useParallax.js';
 import { EnchantedBook } from './EnchantedBook.jsx';
-import { applyBookMotion } from '../bookMotion.js';
+import { applyBookLighting } from '../bookLighting.js';
 import '../scene.css';
 
 const motes = Array.from({ length: 30 }, (_, index) => ({
@@ -13,7 +13,7 @@ const motes = Array.from({ length: 30 }, (_, index) => ({
 }));
 const messages = {
   idle: '点击书本，走进心情日记', rising: '慢慢起身，把心事带上。',
-  walking: '向着那一点温暖，走近一些。', cracking: '书缝里，有一点微光。', opening: '书页轻轻打开，星光正在醒来。',
+  walking: '向着那一点温暖，走近一些。', illuminating: '走近了，书页上的光慢慢亮起。',
   lit: '每一种心情，都值得被温柔收藏。', entering: '让今天的故事，从这里开始。',
 };
 
@@ -25,9 +25,9 @@ export function StoryScene({ onEnter, onNavigate }) {
   const [hidden, setHidden] = useState(document.hidden);
   const reduced = systemReduced || simpleMotion;
   const { status, retry } = useSceneAssets();
-  const updateBook = useCallback((elapsed, simplified) => applyBookMotion(sceneRef.current, elapsed, simplified), []);
+  const updateBook = useCallback((elapsed, simplified) => applyBookLighting(sceneRef.current, elapsed, simplified), []);
   const { phase, playing, begin } = useStory(onEnter, reduced, updateBook);
-  const illuminated = ['opening', 'lit', 'entering'].includes(phase);
+  const illuminated = ['illuminating', 'lit', 'entering'].includes(phase);
   useParallax(sceneRef, !reduced && !playing);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export function StoryScene({ onEnter, onNavigate }) {
       <div className="scene-canvas">
         <div className="world-layer">
           <img className="light-path" src={SCENE_ART.light} alt="" draggable="false" />
-          <EnchantedBook onOpen={begin} disabled={status !== 'ready' || playing} />
+          <EnchantedBook onApproach={begin} disabled={status !== 'ready' || playing} />
           <div className="girl-position" aria-hidden="true">
             <div className="girl-shadow" />
             <div className="girl-sprite" />

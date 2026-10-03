@@ -1,7 +1,6 @@
 export const SCENE_ART = {
-  background: '/art/background.webp', bookClosed: '/art/book-closed.webp',
-  bookOpen: '/art/book-open.webp', girl: '/art/girl-sprites.webp',
-  star: '/art/star.webp', light: '/art/light-path-v2.webp', paper: '/art/page-sheet.webp',
+  background: '/art/background.webp', book: '/art/book-open.webp', girl: '/art/girl-sprites.webp',
+  star: '/art/star.webp', light: '/art/light-path-v2.webp',
 };
 export const STARS = [
   { id: '1', name: '第一颗星', className: 'star-one', delay: '0ms' },
@@ -10,14 +9,14 @@ export const STARS = [
 ];
 export const STORY_DURATION = 6800;
 export const REDUCED_DURATION = 850;
+export const STORY_TIMING = { riseEnd: 1200, arrival: 3400, lightEnd: 5000, entering: 5900 };
 // Share one active-time clock so background tabs cannot skip the story.
 export function getStoryPhase(elapsed, reduced = false) {
   if (reduced) return elapsed < 450 ? 'lit' : 'entering';
-  if (elapsed < 1200) return 'rising';
-  if (elapsed < 1800) return 'walking';
-  if (elapsed < 2560) return 'cracking';
-  if (elapsed < 4800) return 'opening';
-  if (elapsed < 5900) return 'lit';
+  if (elapsed < STORY_TIMING.riseEnd) return 'rising';
+  if (elapsed < STORY_TIMING.arrival) return 'walking';
+  if (elapsed < STORY_TIMING.lightEnd) return 'illuminating';
+  if (elapsed < STORY_TIMING.entering) return 'lit';
   return 'entering';
 }
 export function parseRoute(hash) {

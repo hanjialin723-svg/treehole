@@ -6,60 +6,16 @@
   padding: 0; border: 0; background: transparent; color: inherit;
 }
 .book-button:focus-visible { outline-offset: -18px; border-radius: 4px; }
-/* Preserve the source artboard's 3:4 aspect at every breakpoint. All crop coordinates
-   below refer to this exact frame, including when the button has a different ratio. */
+/* The visible front is the upright page surface, not a cover that swings open. */
 .book-artboard { display: block; position: relative; width: 100%; aspect-ratio: 3 / 4; }
-.book-camera { position: absolute; inset: 0; display: block; perspective: 1500px; perspective-origin: 11% 55%; transform-style: preserve-3d; }
-.book-body, .book-fixed-rim, .book-aura { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
-.book-body { filter: brightness(calc(.62 + var(--book-light) * .38)); }
-/* Keep the top page block, spine and back board in their closed-book positions.
-   Only the front aperture is cut out. Its illuminated image stays behind the leaves. */
-.book-fixed-rim {
-  clip-path: polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 11% 21.5%, 11% 89.2%, 60.5% 96.5%, 60.5% 27.3%, 11% 21.5%);
-  filter: brightness(calc(.87 + var(--book-light) * .13));
-  transform: translateZ(.2px);
-}
-.book-aura { opacity: calc(var(--book-light) * .28); transform: scale(1.065); filter: blur(28px); }
-.book-seam {
-  position: absolute; left: 60%; top: 27.3%; width: .6%; height: 69.2%;
-  background: #ffe795; box-shadow: 0 0 6px 2px #f8dc7ca8;
-  opacity: var(--book-seam, 0); transform: translateZ(.4px); pointer-events: none;
-}
-.book-leaf {
-  display: block; position: absolute; left: 11%; top: 21.5%; width: 49.5%; height: 75%;
-  transform-origin: 0 0; transform-style: preserve-3d;
-}
-.leaf-face {
-  position: absolute; inset: 0; display: block; overflow: hidden;
-  clip-path: polygon(0% 0%, 100% 7.7333%, 100% 100%, 0% 90.2667%);
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+.book-body, .book-aura {
+  position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; user-select: none;
 }
-.leaf-face > img { position: absolute; display: block; user-select: none; pointer-events: none; }
-.leaf-back {
-  clip-path: polygon(0% 7.7333%, 100% 0%, 100% 90.2667%, 0% 100%);
-  transform: rotateY(180deg);
+.book-body {
+  filter: brightness(calc(.42 + var(--book-light) * .58)) saturate(calc(.45 + var(--book-light) * .55));
 }
-.book-cover { transform: translateZ(6px) rotateY(var(--cover-angle)); }
-.cover-outside { filter: brightness(var(--cover-shade)); transform: translateZ(1.5px); }
-.cover-outside > img { width: 202.0202%; height: 133.3333%; left: -22.2222%; top: -28.6667%; }
-.cover-inside {
-  transform: translateZ(-1.5px) rotateY(180deg);
-  background: url('/art/book-closed.webp') 40% 50% / 202% 133%;
-  filter: brightness(calc(.75 + var(--book-light) * .25));
-}
-.cover-inside > img { inset: 1.5%; width: 97%; height: 97%; object-fit: fill; }
-.cover-board-edge {
-  position: absolute; left: 100%; top: 7.73%; width: 3px; height: 92.27%;
-  transform-origin: 0 50%; transform: translateZ(1.5px) rotateY(90deg);
-  background: url('/art/book-closed.webp') 58% 45% / cover;
-}
-.book-page { width: 48.8%; height: 74.3%; }
-.book-page-1 { transform: translateZ(4.5px) rotateY(var(--page-1-angle)); }
-.book-page-2 { transform: translateZ(3px) rotateY(var(--page-2-angle)); }
-.book-page-3 { transform: translateZ(1.5px) rotateY(var(--page-3-angle)); }
-.paper-surface { background: #eee1b4; filter: brightness(calc(.74 + var(--book-light) * .26)); }
-.paper-surface > img { inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.book-aura { opacity: calc(var(--book-light) * .28); transform: scale(1.065); filter: blur(28px); }
 .book-label {
   position: absolute; left: 43%; top: 95%; transform: translateX(-50%) translateY(4px);
   font-size: clamp(14px, 1.15vw, 19px); white-space: nowrap; letter-spacing: .2em;

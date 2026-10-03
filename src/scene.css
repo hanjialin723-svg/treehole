@@ -1,7 +1,6 @@
 .story-scene {
   --mouse-x: 0; --mouse-y: 0;
-  --cover-angle: 0deg; --page-1-angle: 0deg; --page-2-angle: 0deg; --page-3-angle: 0deg;
-  --book-light: 0; --cover-shade: .88; --beam-top: 98%; --beam-bottom: 18%;
+  --book-light: 0;
   position: relative; width: 100%; height: 100svh; min-height: 440px;
   isolation: isolate; overflow: hidden; background: var(--color-night);
 }
@@ -22,17 +21,17 @@
 .world-layer, .motes-layer { position: absolute; inset: 0; }
 .world-layer { transform: translate(calc(var(--mouse-x) * 16px), calc(var(--mouse-y) * 10px)); transition: opacity .9s ease, transform .85s ease-out; }
 .motes-layer { pointer-events: none; transform: translate(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 20px)); transition: transform 1s ease-out; }
-/* The beam stays anchored at the doorway; its aperture and light follow the pages. */
-.light-path { pointer-events: none; position: absolute; z-index: 1; width: 84%; height: 64%; object-fit: fill; top: 60%; left: -12%; opacity: calc(var(--book-light) * .92); clip-path: polygon(var(--beam-top) 0%, 100% 0%, 100% 100%, var(--beam-bottom) 100%); }
+/* The light projection keeps its shape and brightens only after the girl arrives. */
+.light-path { pointer-events: none; position: absolute; z-index: 1; width: 84%; height: 64%; object-fit: fill; top: 60%; left: -12%; opacity: calc(var(--book-light) * .92); }
 .girl-position { --girl-frame: 0%; position: absolute; z-index: 4; left: 46%; top: 76%; width: 6.9%; aspect-ratio: .6; transform: translate(-50%, -88%); pointer-events: none; }
 .girl-sprite, .girl-shadow { position: absolute; inset: 0; background-image: url('/art/girl-sprites.webp'); background-size: 500% 100%; background-position: var(--girl-frame) 0; background-repeat: no-repeat; }
 .girl-sprite { filter: brightness(calc(.8 + var(--book-light) * .25)); }
 .girl-shadow { opacity: calc(.2 + var(--book-light) * .52); filter: brightness(0) blur(1.5px); transform-origin: 50% 88%; transform: skewX(-47deg) scaleY(calc(-.24 - var(--book-light) * .64)) scaleX(1.2); }
 .story-scene[data-playing='true']:not([data-reduced='true']) .girl-position { animation: girl-journey 6.8s linear forwards; }
 .story-scene[data-phase='rising'] .girl-sprite, .story-scene[data-phase='rising'] .girl-shadow { animation: girl-rise 1.2s step-end forwards; }
-.story-scene:is([data-phase='walking'], [data-phase='cracking'], [data-phase='opening']) .girl-position { --girl-frame: 75%; }
-.story-scene:is([data-phase='walking'], [data-phase='cracking'], [data-phase='opening']) :is(.girl-sprite, .girl-shadow) { animation: girl-steps .78s step-end infinite; }
-.story-scene[data-phase='lit'] .girl-position, .story-scene[data-phase='entering'] .girl-position { --girl-frame: 50%; }
+.story-scene[data-phase='walking'] .girl-position { --girl-frame: 75%; }
+.story-scene[data-phase='walking'] :is(.girl-sprite, .girl-shadow) { animation: girl-steps .78s step-end infinite; }
+.story-scene:is([data-phase='illuminating'], [data-phase='lit'], [data-phase='entering']) .girl-position { --girl-frame: 50%; }
 .star-navigation { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 .star-link { position: absolute; display: block; pointer-events: auto; aspect-ratio: 1; text-decoration: none; color: var(--color-cream); outline-color: var(--color-cream); transform: translate(-50%, -50%); }
 .star-link[aria-disabled='true'] { pointer-events: none; }
@@ -65,8 +64,8 @@
 @keyframes girl-rise { 0% { background-position-x: 0%; } 38% { background-position-x: 25%; } 83%, 100% { background-position-x: 50%; } }
 @keyframes girl-steps { 0%, 100% { background-position-x: 75%; } 50% { background-position-x: 100%; } }
 @keyframes girl-journey {
-  0%, 17.6% { left: 46%; top: 76%; width: 6.9%; }
-  70.588235%, 100% { left: 63.1%; top: 68%; width: 5.4%; }
+  0%, 17.647059% { left: 46%; top: 76%; width: 6.9%; }
+  50%, 100% { left: 63.1%; top: 68%; width: 5.4%; }
 }
 @keyframes star-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(1deg); } }
 @keyframes mote-drift { 0%, 100% { transform: translate(0, 2px) scale(.7); } 50% { transform: translate(6px, -10px) scale(1.1); } }
