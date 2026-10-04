@@ -8,9 +8,17 @@ Run the local server yourself and open the preview in the browser available to t
 - Use layered raster art, perspective, lighting and subtle cursor parallax for 2.5D depth.
 - Initially the girl crouches, the upright book shows its dim page surface and three large stars are dim. Clicking the book plays rise/walk/illuminate, then automatically navigates to the mood diary.
 - Stars brighten and scale up on hover/focus, restoring their scene-dependent appearance on leave; each links to its own placeholder.
-- Mood diary now uses a spread-open notebook overview. Each entry shows a blue date, gray content excerpt and pink mood weather. The upper-right Add Diary action and clickable entries open matching creation/editing views. Dates and short text are editable; weather is inferred from text and can be manually adjusted. Latest approved change: use a Node.js + SQLite backend to persist all diaries, without login. Everyone accessing the site shares the same diary. Preserve optional import of old browser data. Supply server deployment configuration and a deployment Git branch; do not add accounts. Star destinations remain placeholders.
+- Mood diary now uses a spread-open notebook overview. Each entry shows a blue date, gray content excerpt and pink mood weather. The upper-right Add Diary action and clickable entries open matching creation/editing views. Dates and short text are editable; weather is inferred from text and can be manually adjusted. Use a Node.js + SQLite backend to persist diaries. Preserve optional import of old browser data. Star destinations remain placeholders.
 - Keep local Git history. Runtime art is optimized WebP; preserve original PNGs and generation prompts under docs/design.
 - Latest correction: the front-facing area circled by the user is the page surface of an upright book, not a black front cover. Remove ALL cover/page opening and closing animation. Use the same stationary page-visible book art in both dim and bright states. Only after the girl approaches should the page light, projected light and stars brighten. Keep automatic diary navigation and star interactions.
+
+## User-approved accounts · 2026-10-04
+
+- Implement login and registration on `deploy/fullstack-diary`; require authenticated access to each user's own diaries, enforced by the backend.
+- Preserve every pre-existing server diary and assign it to the pre-created user `Lin`. The user explicitly selected temporary login with username `Lin` and an empty password. Once Lin sets a password, empty-password login must stop; never re-create or reset this exception on restart.
+- Allow username and password changes with current-password verification, preserving ownership by stable user ID. New accounts require a password.
+- Use the frontend-design skill, preserve the oil-pastel night blue background and warm paper notebook style, and add matching login/register/account pages.
+- Update the existing server deployment with a consistent SQLite backup and verified data preservation; keep other server applications isolated.
 
 Before making substantial visual changes, use the Product Design plugin's `get-context` skill when the visual source is unclear or no longer matches the current goal. When the user gives durable prototype-specific design feedback, preferences, or decisions, record them in `AGENTS.md`.
 

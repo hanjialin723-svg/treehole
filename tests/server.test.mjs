@@ -9,6 +9,7 @@ import { startServer } from '../server/index.mjs';
 
 const draft = (date = '2026-10-03', content = '今天很开心', extra = {}) => ({ date, content, weatherMode: 'auto', weather: 'cloudy', ...extra });
 const legacy = (date, content = '今天很开心', extra = {}) => ({ ...draft(date, content), id: `old-${date}`, weather: 'sunny', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-02T00:00:00.000Z', ...extra });
+const fixtureCookies = new Map();
 
 async function fixture(t, options = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'treehool-api-'));
@@ -23,21 +24,29 @@ async function fixture(t, options = {}) {
     return `http://127.0.0.1:${app.server.address().port}`;
   };
   let base = await start();
+  let cookie = '';
+  async function json(path, method = 'GET', body, headers = {}) {
+    const response = await fetch(`${base}${path}`, { method, headers: { Cookie: cookie, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+    if (response.headers.get('set-cookie')) {
+      cookie = response.headers.get('set-cookie').split(';')[0];
+      fixtureCookies.set(base, cookie);
+    }
+    return { status: response.status, headers: response.headers, body: await response.json() };
+  }
+  assert.equal((await json('/api/auth/register', 'POST', { username: 'TestUser', password: 'test-password-123' }, { Origin: options.publicOrigin || base })).status, 201);
   t.after(async () => { await app.close(); await rm(dir, { recursive: true, force: true }); });
   return {
     dir, staticDir, databasePath,
     get base() { return base; },
-    async restart() { await app.close(); base = await start(); },
-    async json(path, method = 'GET', body, headers = {}) {
-      const response = await fetch(`${base}${path}`, { method, headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
-      return { status: response.status, headers: response.headers, body: await response.json() };
-    },
+    get cookie() { return cookie; },
+    async restart() { await app.close(); base = await start(); fixtureCookies.set(base, cookie); },
+    json,
   };
 }
 
 function rawRequest(base, path, { method = 'GET', headers = {}, chunks = [] } = {}) {
   return new Promise((resolve, reject) => {
-    const req = request(new URL(base), { path, method, headers }, (res) => {
+    const req = request(new URL(base), { path, method, headers: { Cookie: fixtureCookies.get(base) || '', ...headers } }, (res) => {
       const chunks = [];
       res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString('utf8'), headers: res.headers }));
@@ -162,9 +171,9 @@ test('PUBLIC_ORIGIN supports exact reverse proxy origin only', async (t) => {
 
 test('content type, malformed JSON and fixed/chunked body limits', async (t) => {
   const f = await fixture(t);
-  const unsupported = await fetch(`${f.base}/api/diaries`, { method: 'POST', body: JSON.stringify(draft()), headers: { 'Content-Type': 'text/plain' } });
+  const unsupported = await fetch(`${f.base}/api/diaries`, { method: 'POST', body: JSON.stringify(draft()), headers: { Cookie: f.cookie, 'Content-Type': 'text/plain' } });
   assert.equal(unsupported.status, 415);
-  const malformed = await fetch(`${f.base}/api/diaries`, { method: 'POST', body: '{', headers: { 'Content-Type': 'application/json' } });
+  const malformed = await fetch(`${f.base}/api/diaries`, { method: 'POST', body: '{', headers: { Cookie: f.cookie, 'Content-Type': 'application/json' } });
   assert.equal(malformed.status, 400);
   assert.equal((await malformed.json()).code, 'INVALID_JSON');
   const tooLarge = await f.json('/api/diaries', 'POST', draft(undefined, 'a'.repeat(33000)));

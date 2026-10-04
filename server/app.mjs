@@ -2,6 +2,7 @@ import { createReadStream } from 'node:fs';
 import { stat, realpath } from 'node:fs/promises';
 import { resolve, sep, extname } from 'node:path';
 import { apiError } from './store.mjs';
+import { cookieToken, sessionCookie } from './auth.mjs';
 
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8' };
 
@@ -59,12 +60,37 @@ async function readJson(req, limit) {
   }
 }
 
-export function createApp({ store, staticDir, publicOrigin, logger = console }) {
+export function createApp({ store, staticDir, publicOrigin, trustProxy = false, logger = console }) {
   if (publicOrigin) {
     const parsed = new URL(publicOrigin);
     if (!['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== publicOrigin) throw new Error('PUBLIC_ORIGIN must be an exact HTTP(S) origin without a trailing slash');
   }
   const root = resolve(staticDir);
+  const secureCookies = publicOrigin?.startsWith('https:') || false;
+  const attempts = new Map();
+  function throttle(req, path, username = '') {
+    const address = trustProxy ? req.headers['x-real-ip'] || req.socket.remoteAddress : req.socket.remoteAddress;
+    const key = `${address}:${path}:${typeof username === 'string' ? username.trim().toLowerCase().slice(0, 128) : ''}`;
+    const now = Date.now();
+    for (const [id, item] of attempts) if (item.until <= now) attempts.delete(id);
+    let item = attempts.get(key);
+    if (!item) {
+      if (attempts.size >= 10000) attempts.delete(attempts.keys().next().value);
+      item = { count: 0, until: now + 15 * 60 * 1000 };
+      attempts.set(key, item);
+    }
+    if (++item.count > (path === '/api/auth/login' ? 15 : 20)) throw apiError(429, 'TOO_MANY_ATTEMPTS', '尝试次数过多，请 15 分钟后再试。');
+    return key;
+  }
+  function authenticated(req) {
+    const user = store.session(cookieToken(req));
+    if (!user) throw apiError(401, 'AUTH_REQUIRED', '请先登录，再打开你的日记本。');
+    return user;
+  }
+  function signedIn(res, result, status = 200) {
+    res.setHeader('Set-Cookie', sessionCookie(result.token, secureCookies));
+    return sendJson(res, status, { user: result.user });
+  }
   return async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
@@ -79,17 +105,41 @@ export function createApp({ store, staticDir, publicOrigin, logger = console }) 
       if (path === '/api' || path.startsWith('/api/')) {
         res.setHeader('Cache-Control', 'no-store');
         if (req.method === 'GET' && path === '/api/health') return sendJson(res, 200, { ok: true });
-        if (req.method === 'GET' && path === '/api/diaries') return sendJson(res, 200, { entries: store.list() });
+        validateOrigin(req, publicOrigin);
+        if (req.method === 'GET' && path === '/api/auth/session') return sendJson(res, 200, { user: store.session(cookieToken(req)) });
+        if (req.method === 'POST' && ['/api/auth/register', '/api/auth/login'].includes(path)) {
+          // Bound total hashing work per client, including attempts with varying usernames.
+          throttle(req, '/api/auth/all');
+          const input = await readJson(req, 4096);
+          const attemptKey = throttle(req, path, input?.username);
+          const result = path.endsWith('/register') ? await store.register(input) : await store.login(input);
+          if (path.endsWith('/login')) attempts.delete(attemptKey);
+          return signedIn(res, result, path.endsWith('/register') ? 201 : 200);
+        }
+        if (req.method === 'POST' && path === '/api/auth/logout') {
+          await readJson(req, 4096);
+          store.logout(cookieToken(req));
+          res.setHeader('Set-Cookie', sessionCookie('', secureCookies, true));
+          return sendJson(res, 200, { ok: true });
+        }
+        if (req.method === 'PUT' && path === '/api/auth/account') {
+          const user = authenticated(req);
+          throttle(req, '/api/auth/account', user.id);
+          return signedIn(res, await store.updateAccount(user.id, await readJson(req, 4096)));
+        }
+        const diaryRoute = path === '/api/diaries' || /^\/api\/diaries\/[^/]{1,128}$/.test(path);
+        const user = diaryRoute ? authenticated(req) : null;
+        if (req.method === 'GET' && path === '/api/diaries') return sendJson(res, 200, { entries: store.list(user.id) });
         if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
           validateOrigin(req, publicOrigin);
           const isImport = path === '/api/diaries/import' && req.method === 'POST';
           const input = await readJson(req, isImport ? 2 * 1024 * 1024 : 32 * 1024);
-          if (req.method === 'POST' && path === '/api/diaries') return sendJson(res, 201, { entry: store.create(input) });
-          if (isImport) return sendJson(res, 200, store.import(input));
+          if (req.method === 'POST' && path === '/api/diaries') return sendJson(res, 201, { entry: store.create(user.id, input) });
+          if (isImport) return sendJson(res, 200, store.import(user.id, input));
           const entryRoute = /^\/api\/diaries\/([^/]{1,128})$/.exec(path);
-          if (entryRoute && req.method === 'PUT') return sendJson(res, 200, { entry: store.update(entryRoute[1], input) });
+          if (entryRoute && req.method === 'PUT') return sendJson(res, 200, { entry: store.update(user.id, entryRoute[1], input) });
           if (entryRoute && req.method === 'DELETE') {
-            store.delete(entryRoute[1], input);
+            store.delete(user.id, entryRoute[1], input);
             return sendJson(res, 200, { ok: true });
           }
         }

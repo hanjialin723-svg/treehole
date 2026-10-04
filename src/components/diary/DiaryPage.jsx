@@ -5,6 +5,8 @@ import { DiaryBook } from './DiaryBook.jsx';
 import { DiaryEditor } from './DiaryEditor.jsx';
 import { Icon } from './WeatherIcon.jsx';
 import '../../diary.css';
+import { useAuth } from '../auth/AuthProvider.jsx';
+import '../../auth.css';
 
 function readLegacyDiaries() {
   try { return loadDiary(window.localStorage); }
@@ -19,6 +21,7 @@ function rangeLabel(entries) {
 }
 
 export function DiaryPage({ route, onNavigate, onBack, registerNavigationGuard }) {
+  const { user } = useAuth();
   const [diary, setDiary] = useState({ entries: [], error: null, loading: true });
   const [legacy, setLegacy] = useState(readLegacyDiaries);
   const [importing, setImporting] = useState(false);
@@ -113,6 +116,8 @@ export function DiaryPage({ route, onNavigate, onBack, registerNavigationGuard }
   return <main className="diary-shell">
     <div className="diary-atmosphere" aria-hidden="true" />
     <div className="diary-layout">
+      <div className="diary-account-bar"><span>{user.username} 的日记本</span><button type="button" onClick={() => onNavigate('/account')}>账户设置</button></div>
+      {user.needsPassword && !editing ? <div className="diary-password-reminder"><span>账户暂未设置密码，建议为你的日记本加一把锁。</span><button type="button" onClick={() => onNavigate('/account')}>设置密码</button></div> : null}
       {diary.error ? <div className="diary-notice diary-error" role="alert"><span>{diary.error}</span><button type="button" onClick={() => reload()}>重试读取</button></div> : null}
       {editing && notice ? <p className="diary-notice" role="status">{notice}</p> : null}
       {diary.loading ? <div className="diary-missing" role="status"><h1>正在取出你的日记……</h1></div> : editing && (route.view === 'new' || editorEntry) ? <DiaryEditor key={editorEntry?.id || 'new'} entry={editorEntry} onSave={save} onDelete={remove}
@@ -143,7 +148,7 @@ export function DiaryPage({ route, onNavigate, onBack, registerNavigationGuard }
           <button type="button" aria-label="下一页日记" disabled={currentSpread === pages - 1} onClick={() => setSpread((value) => value + 1)}><Icon name="chevron-right" /></button>
         </nav>
       </>}
-      <p className="diary-local-note">日记保存在服务器，当前为所有访客共用的日记本。</p>
+      <p className="diary-local-note">日记保存在你的账户中，登录后可在不同设备上继续写。</p>
     </div>
   </main>;
 }

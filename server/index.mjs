@@ -12,13 +12,14 @@ export async function startServer({
   databasePath = process.env.DATABASE_PATH ?? resolve(projectRoot, 'data/diary.sqlite'),
   staticDir = resolve(projectRoot, 'dist/client'),
   publicOrigin = process.env.PUBLIC_ORIGIN || undefined,
+  trustProxy = process.env.TRUST_PROXY === '1',
   logger = console,
 } = {}) {
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('PORT must be an integer between 0 and 65535');
   const store = openStore(databasePath);
   let server;
   try {
-    server = createServer({ requestTimeout: 30_000, headersTimeout: 15_000 }, createApp({ store, staticDir, publicOrigin, logger }));
+    server = createServer({ requestTimeout: 30_000, headersTimeout: 15_000 }, createApp({ store, staticDir, publicOrigin, trustProxy, logger }));
     await new Promise((resolve, reject) => {
       server.once('error', reject);
       server.listen(port, host, () => { server.off('error', reject); resolve(); });

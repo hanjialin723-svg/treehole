@@ -1,4 +1,4 @@
-async function request(path, { method = 'GET', body, signal } = {}) {
+export async function request(path, { method = 'GET', body, signal } = {}) {
   const controller = new AbortController();
   const abort = () => controller.abort();
   signal?.addEventListener('abort', abort, { once: true });
@@ -11,7 +11,10 @@ async function request(path, { method = 'GET', body, signal } = {}) {
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     const payload = await response.json().catch(() => null);
-    if (!response.ok) throw Object.assign(new Error(payload?.error || '服务器暂时无法处理，请稍后重试。'), { code: payload?.code, status: response.status });
+    if (!response.ok) {
+      if (payload?.code === 'AUTH_REQUIRED') window.dispatchEvent(new Event('treehole-session-expired'));
+      throw Object.assign(new Error(payload?.error || '服务器暂时无法处理，请稍后重试。'), { code: payload?.code, status: response.status });
+    }
     if (!payload || typeof payload !== 'object') throw new Error('服务器响应异常，请稍后重新读取。');
     return payload;
   } catch (error) {

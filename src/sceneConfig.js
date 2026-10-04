@@ -21,6 +21,7 @@ export function getStoryPhase(elapsed, reduced = false) {
 }
 export function parseRoute(hash) {
   const path = hash.replace(/^#/, '') || '/';
+  if (path === '/account') return { kind: 'account' };
   if (path === '/diary') return { kind: 'diary', view: 'list' };
   if (path === '/diary/new') return { kind: 'diary', view: 'new' };
   const entryMatch = path.match(/^\/diary\/entry\/([a-zA-Z0-9_-]+)$/);

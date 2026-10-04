@@ -2,7 +2,21 @@
 
 部署分支：`deploy/fullstack-diary`。前端和日记 API 由同一个 Node.js 24 服务提供，SQLite 保存在服务器磁盘中。无需单独安装数据库或配置跨域。
 
-这一版没有登录：能够访问网站的人共用同一本日记，并能够查看、新增、修改和删除其中的内容。`PUBLIC_ORIGIN` 仅用于校验浏览器请求来源，不提供访问控制。
+这一版支持账户注册、登录和用户隔离。所有日记 API 都要求有效会话；新注册账户是空白日记本。`PUBLIC_ORIGIN` 用于来源校验，并在 HTTPS 部署中启用 Secure 会话 Cookie。
+
+## 账户与旧数据迁移
+
+SQLite v1 → v2 自动在事务中升级；现有记录的 ID、日期、文字、天气和时间戳完整保留，全部归属首次创建的 Lin。每用户每天一篇日记，用户名不区分大小写。以后重启不会重新创建 Lin 或清空密码。
+
+按用户明确选择，Lin 暂时可以用用户名 `Lin`、空密码登录；在「账户设置」填写新密码和确认密码后，空密码登录立即失效。其他注册账户必须填写 8–128 字符密码。修改用户名或密码需验证当前密码，并撤销该账户的其他会话；记录始终归属稳定用户 ID。
+
+密码用独立随机盐的 scrypt 哈希保存；会话使用随机令牌，数据库仅保存其 SHA-256 摘要，Cookie 设置 HttpOnly、SameSite=Strict，HTTPS 时设置 Secure。会话有效期 7 天，退出登录立即撤销。登录、注册及账户修改有尝试频率限制。
+
+已核实的服务器使用 `treehole.service`，Node 在 `/opt/treehole-node/bin/node`，应用 `/opt/treehole/current` 指向独立 release；数据库位于 `/var/lib/treehole/diary.sqlite`，监听 `127.0.0.1:3110`，公开网址为 `https://treehole.ventsdenye.com`。本机生成产物上传独立 release，不在服务器安装依赖或构建。发布前在独立测试目录执行 Linux 回归测试；短暂停服取得最后一致备份，再切换 release 和启动服务。使用 `scripts/verify-account-migration.mjs BEFORE.sqlite AFTER.sqlite` 只读核对每个原有字段、归属及数据库完整性。
+
+若使用可信反向代理，且服务只接受该代理的连接，可设置 `TRUST_PROXY=1`，按代理覆盖后的 `X-Real-IP` 限流。未设置时按直接连接地址限流。此选项不应在可直接公开访问的服务上启用。
+
+数据库升级后不能直接切回只支持 v1 的旧后端。回滚必须先停服、备份当前 v2 数据，再恢复迁移前的备份及旧 release；恢复会丢失升级后的新增记录，需先另存，不能在运行中覆盖 SQLite 文件或 WAL。
 
 ## Docker Compose 部署（推荐）
 

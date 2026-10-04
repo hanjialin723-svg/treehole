@@ -3,8 +3,24 @@ import { StoryScene } from './components/StoryScene.jsx';
 import { DestinationPage } from './components/DestinationPage.jsx';
 import { DiaryPage } from './components/diary/DiaryPage.jsx';
 import { parseRoute } from './sceneConfig.js';
+import { AuthProvider, useAuth } from './components/auth/AuthProvider.jsx';
+import { AccountPage } from './components/auth/AccountPage.jsx';
+
+function PrivatePage({ children, onBack }) {
+  const auth = useAuth();
+  if (auth.loading || (auth.error && !auth.user)) return <main className="diary-shell"><div className="diary-atmosphere" aria-hidden="true" /><div className="diary-missing" role="status">
+    <h1>{auth.loading ? '正在打开你的日记本……' : '暂时无法确认登录状态'}</h1>
+    {auth.error ? <><p role="alert">{auth.error}</p><button className="diary-primary" onClick={auth.refresh}>重新连接</button></> : null}
+    <button className="diary-back" onClick={onBack}>回到星光里</button>
+  </div></main>;
+  return auth.user ? children(auth.user) : <AccountPage onBack={onBack} />;
+}
 
 export function App() {
+  return <AuthProvider><RoutedApp /></AuthProvider>;
+}
+
+function RoutedApp() {
   const [route, setRoute] = useState(() => parseRoute(window.location.hash));
   const currentHash = useRef(window.location.hash || '#/');
   const historyIndex = useRef(window.history.state?.treehoolIndex ?? 0);
@@ -42,6 +58,7 @@ export function App() {
   }, [requestRoute]);
   useEffect(() => {
     document.title = route.kind === 'diary' ? '心情日记本 · 星光树洞'
+      : route.kind === 'account' ? '我的账户 · 星光树洞'
       : route.kind === 'star' ? `第${route.starId}颗星 · 星光树洞` : '星光树洞 · 把心事交给星光';
   }, [route]);
   const navigate = useCallback((path) => requestRoute(`#${path}`), [requestRoute]);
@@ -50,6 +67,8 @@ export function App() {
   return route.kind === 'scene'
     ? <StoryScene onEnter={enterDiary} onNavigate={navigate} />
     : route.kind === 'diary'
-      ? <DiaryPage route={route} onNavigate={navigate} onBack={goHome} registerNavigationGuard={registerNavigationGuard} />
+      ? <PrivatePage onBack={goHome}>{(user) => <DiaryPage key={user.id} route={route} onNavigate={navigate} onBack={goHome} registerNavigationGuard={registerNavigationGuard} />}</PrivatePage>
+      : route.kind === 'account'
+        ? <PrivatePage onBack={goHome}>{(user) => <AccountPage key={user.id} settings onBack={enterDiary} />}</PrivatePage>
       : <DestinationPage kind={route.kind} starId={route.starId} onBack={goHome} />;
 }

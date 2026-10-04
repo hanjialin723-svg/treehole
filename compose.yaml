@@ -12,6 +12,7 @@ services:
       PORT: "3000"
       DATABASE_PATH: /app/data/diary.sqlite
       PUBLIC_ORIGIN: "${PUBLIC_ORIGIN:-}"
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
     volumes:
       - diary-data:/app/data
     read_only: true

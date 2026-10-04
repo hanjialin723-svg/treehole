@@ -1,0 +1,48 @@
+.auth-layout { max-width: 1100px; }
+.auth-shell { padding-bottom: 36px; }
+.auth-book { margin-top: 28px; aspect-ratio: 1.7 / 1; }
+.auth-book .diary-book-pages { inset: 11% 7% 12%; gap: 9%; }
+.auth-intro { position: relative; justify-content: center; align-items: center; text-align: center; color: var(--diary-blue); }
+.auth-bookmark { position: absolute; top: -7%; left: 10px; padding: 17px 9px 25px; writing-mode: vertical-rl; letter-spacing: .22em; color: #fff6dd; background: #617f97; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 90%, 0 100%); font-size: 14px; }
+.auth-intro h2 { font-size: clamp(25px, 2.4vw, 33px); font-weight: 400; letter-spacing: .08em; overflow-wrap: anywhere; margin: 24px 0; }
+.auth-intro p { color: #7d7779; font-size: 18px; line-height: 2; margin: 0; }
+.auth-weather { display: flex; gap: 25px; color: var(--diary-pink); margin: 37px 0 25px; }
+.auth-private-note { color: #938980; font-size: 13px; letter-spacing: .04em; }
+.auth-form-page { justify-content: center; }
+.auth-tabs { display: flex; gap: 28px; margin-bottom: 23px; border-bottom: 1px solid #8b8b893b; }
+.auth-tabs button { border: 0; border-bottom: 2px solid transparent; padding: 6px 3px 12px; background: transparent; color: #938783; font-size: 20px; letter-spacing: .12em; }
+.auth-tabs button[aria-pressed=true] { border-bottom-color: var(--diary-blue); color: var(--diary-blue); }
+.auth-form-title { margin: 0 0 17px; font-weight: 400; color: var(--diary-blue); font-size: 21px; }
+.auth-form { display: flex; flex-direction: column; gap: 7px; }
+.auth-form label { margin-top: 5px; font-size: 15px; color: #6f6970; }
+.auth-form input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #b5b0a57d; border-radius: 5px; color: #4d5662; background: #fffdf54f; font: inherit; font-size: 17px; }
+.auth-form input::placeholder { color: #a39b93; font-size: 14px; }
+.auth-form input:focus-visible, .auth-tabs button:focus-visible, .auth-password-label button:focus-visible { outline: 2px solid #3d7198; outline-offset: 3px; }
+.auth-password-label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.auth-password-label button { border: 0; padding: 0; color: var(--diary-blue); background: transparent; font-size: 12px; }
+.auth-hint { font-size: 12px; color: #8c8280; line-height: 1.6; }
+.auth-submit { margin-top: 14px; min-height: 43px; border-radius: 5px; font-size: 16px; background: #f3e4bc; border-color: #cfbd93; }
+.auth-bottom-hint { text-align: center; margin: 3px 0 0; }
+.auth-message { margin: 5px 0 0; font-size: 14px; color: #3d7198; line-height: 1.6; }
+.auth-error { color: #a54458; }
+.auth-logout { border: 1px solid #edd99c66; background: #15384f66; color: #f7e4ad; border-radius: 999px; padding: 8px 18px; font-size: 15px; }
+.diary-account-bar { display: flex; justify-content: flex-end; gap: 18px; align-items: center; margin: 0 24px 10px; color: #e1d6bb; font-size: 14px; }
+.diary-account-bar button { padding: 4px 0; border: 0; border-bottom: 1px solid #edd99c66; background: transparent; color: #f7e4ad; }
+.diary-password-reminder { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 11px 18px; margin: 12px 24px; background: #183e54b3; border: 1px solid #edd99c66; border-radius: 6px; font-size: 14px; line-height: 1.6; }
+.diary-password-reminder button { border: 0; border-bottom: 1px solid currentColor; padding: 0; color: #ffedbd; background: transparent; }
+@media (max-width: 1100px) { .auth-book { min-height: 690px; } }
+@media (max-width: 700px) {
+  .auth-book { min-height: 0; margin-top: 25px; }
+  .auth-book .diary-book-pages { inset: auto; gap: 0; }
+  .auth-intro { min-height: 270px; padding: 35px 25px 30px; border-radius: 7px 7px 0 0; background: #fbf4e3; filter: none; }
+  .auth-bookmark { top: 0; left: 20px; padding-top: 12px; }
+  .auth-intro > svg { width: 30px; height: 30px; }
+  .auth-intro h2 { margin: 14px 0; font-size: 25px; }
+  .auth-intro p { font-size: 15px; line-height: 1.8; }
+  .auth-weather { margin: 18px 0 12px; }
+  .auth-form-page { min-height: 0; padding: 20px 30px 35px; border-top: 1px dashed #b5b0a57d; border-radius: 0 0 7px 7px; background: #fbf4e3 !important; filter: none; }
+  .auth-submit { margin-top: 14px; }
+  .auth-logout { margin-top: 4px; white-space: nowrap; padding: 7px 12px; }
+  .diary-account-bar { margin: 0 6px 14px; gap: 12px; }
+  .diary-password-reminder { margin: 12px 6px; }
+}
