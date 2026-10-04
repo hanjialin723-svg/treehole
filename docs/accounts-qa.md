@@ -22,4 +22,11 @@ Codex 内置浏览器，本地前端 `http://127.0.0.1:4173` 和独立数据库 
 
 ## 正式部署
 
-部署结果在完成备份副本试迁移、线上更新和公开网址检查后补充。账户无密码阶段遵从用户明确选择；Lin 设置密码后空密码失效。所有旧日记原始字段必须与迁移前的一致备份逐一相等。
+- 2026-10-04 已更新 `https://treehole.ventsdenye.com`，运行版本 `/opt/treehole/releases/20261004-247a192`，应用提交 `247a192`。
+- 一致在线备份副本先试迁移，再停服取得最终一致备份 `/var/lib/treehole/backups/pre-accounts-final-20261004-247a192.sqlite`；旧 release 保留。
+- 正式迁移后只读核对：原有 **1 条**日记的 ID、日期、正文、天气模式、天气、创建时间、更新时间逐字段完全相等，全部属于 Lin；schema v2、完整性及外键检查正常。
+- 原始字段指纹前后相同：`fddbbb7db508df1b3a877d4b111b248b658659a052240bf933f823c7939b30ba`。没有删除或改写旧日记。
+- 正式 HTTPS API 检查通过：匿名读取 401、错误密码 401、Lin 空密码登录 200 并读取 1 条旧记录、HttpOnly / SameSite=Strict / Secure Cookie、退出后原会话被拒绝、新前端 CSS 可访问。
+- 可信 Nginx 已覆盖 `X-Real-IP`，服务仅监听回环地址；启用 `TRUST_PROXY=1`，原环境文件保留为 `/etc/treehole.env.pre-accounts-247a192`。
+- 正式浏览器刷新显示登录页，并以 Lin 空密码登录成功：显示「Lin 的日记本」、设置密码提醒和原有的 2026-10-03 日记。正式 Lin 密码保持为空；用户名、密码变更和注册隔离在独立测试数据库中验收，避免修改用户的正式数据。
+- 最终登录页截图：`docs/design/auth-login-20261004.jpg`（本地）与 `docs/design/auth-live-login-20261004.jpg`（正式站点）。
